@@ -13,6 +13,7 @@ app.use(cors({
 }));
 
 app.use(bodyParser.json());
+app.use('/images', express.static('public/images'));
 const creatorRoutes = require("./routes/creatorRoutes");
 const companyRoutes = require("./routes/companyRoutes");
 
