@@ -9,4 +9,6 @@ res.send("Working Fine");
 router.post("/creator/register",upload.single("avatar"),creatorController.register);
 router.post("/creator/login",creatorController.login);
 router.get("/creator/getAll",creatorController.getAll);
+router.get("/creator/getSingle/:id", creatorController.getSingle);
+
 module.exports = router;

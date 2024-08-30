@@ -12,8 +12,9 @@ const register = async (req, res, next) => {
         twitter,
         TypeofContent,
         Descryption,
-        avatar
     } = req.body;
+
+    let avatar = req.file;
 
     let user = await Company.findOne({ email: email });
     if (user)
@@ -32,7 +33,7 @@ const register = async (req, res, next) => {
                     twitter,
                     TypeofContent,
                     Descryption,
-                    avatar
+                    avatar:avatar.filename
                 });
                 let token = jwt.sign({ UserId: user._id }, process.env.JWT_KEY);
                 res.status(200).json({
@@ -76,6 +77,22 @@ const getAll = async (req, res, next) => {
     res.json(companies);
 }
 
+const getSingle = async (req, res, next) => {
+    const companyId = req.params.id;  
+    console.log(companyId);
+    let creator;
+    try {
+        creator = await Company.findById(companyId, '-password');  
+        if (!creator) {
+            return next(new HttpError("Company not found", 404));  
+        }
+    } catch (error) {
+        return next(new HttpError("Something went wrong, could not retrieve creator", 500));
+    }
+    res.json(creator);  
+}
+
 exports.register = register;
 exports.login = login;
 exports.getAll = getAll;
+exports.getSingle = getSingle;

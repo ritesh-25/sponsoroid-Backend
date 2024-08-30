@@ -83,7 +83,22 @@ const getAll = async (req, res, next) => {
     res.json(users);
 }
 
+const getSingle = async (req, res, next) => {
+    const creatorId = req.params.id;  
+    console.log(creatorId);
+    let creator;
+    try {
+        creator = await Creator.findById(creatorId, '-password');  
+        if (!creator) {
+            return next(new HttpError("Creator not found", 404));  
+        }
+    } catch (error) {
+        return next(new HttpError("Something went wrong, could not retrieve creator", 500));
+    }
+    res.json(creator);  
+}
 exports.register = register;
 exports.login = login;
 exports.getAll = getAll;
+exports.getSingle = getSingle;
 
