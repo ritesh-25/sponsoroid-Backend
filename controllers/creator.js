@@ -2,6 +2,7 @@ const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt")
 const Creator = require("../models/creator");
 const HttpError = require("../utils/HttpError");
+const upload = require("../config/multer");
 // const HttpError = require("../utils/HttpError");
 
 const register = async (req, res, next) => {
@@ -13,19 +14,22 @@ const register = async (req, res, next) => {
         password,
         TypeofContent,
         descryption,
-        avatar
     } = req.body;
+    let avatar = req.file;
+    if (!avatar) {
+        return res.status(400).json({ message: "Avatar file is required." });
+    }
 
+    console.log(avatar);
     let user = await Creator.findOne({ email: email });
     if (user)
-        return next(new HttpError("User already exists", 422));
-
+    return next(new HttpError("User already exists", 422));
 
     bcrypt.genSalt(10, function (err, salt) {
         bcrypt.hash(password, salt, async function (err, hash) {
             if (err) return res.send(err);
             else {
-                let user = await Creator.create({
+                let user = new Creator({
                     name,
                     email,
                     instaLink,
@@ -33,8 +37,10 @@ const register = async (req, res, next) => {
                     password: hash,
                     TypeofContent,
                     descryption,
-                    avatar
+                    avatar:avatar.filename
                 });
+                console.log(user);
+                user.save();
                 let token = jwt.sign({ UserId: user._id,  userType:"creator" }, process.env.JWT_KEY);
                 res.status(200).json({
                     status: "Success",
@@ -42,9 +48,11 @@ const register = async (req, res, next) => {
                     token: token,
                     user: user,
                 });
+
             }
         });
     });
+
 }
 
 const login = async (req, res, next) => {
@@ -70,14 +78,29 @@ const login = async (req, res, next) => {
 const getAll = async (req, res, next) => {
     let users;
     try {
-        users = await Creator.find({},'-password');
+        users = await Creator.find({}, '-password');
     } catch (error) {
         return next(new HttpError("users not found", 404));
     }
     res.json(users);
 }
 
+const getSingle = async (req, res, next) => {
+    const creatorId = req.params.id;  
+    console.log(creatorId);
+    let creator;
+    try {
+        creator = await Creator.findById(creatorId, '-password');  
+        if (!creator) {
+            return next(new HttpError("Creator not found", 404));  
+        }
+    } catch (error) {
+        return next(new HttpError("Something went wrong, could not retrieve creator", 500));
+    }
+    res.json(creator);  
+}
 exports.register = register;
 exports.login = login;
 exports.getAll = getAll;
+exports.getSingle = getSingle;
 

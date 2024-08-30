@@ -2,7 +2,6 @@ const express = require("express");
 const mongoose = require("mongoose");
 const bodyParser = require("body-parser");
 const cors = require('cors');
-const company = require("./models/company");
 require("dotenv").config();
 
 const app = express();
@@ -13,6 +12,7 @@ app.use(cors({
 }));
 
 app.use(bodyParser.json());
+app.use('/images', express.static('public/images'));
 const creatorRoutes = require("./routes/creatorRoutes");
 const companyRoutes = require("./routes/companyRoutes");
 
