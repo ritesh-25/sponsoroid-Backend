@@ -34,8 +34,8 @@ app.use("/api/v1",companyRoutes);
 app.get("/", (req, res) => {
   res.send("test");
 });
-const PORT = 2000;
+// const PORT = 2000;
 
-app.listen(PORT, () => {
-  console.log(`listening on port ${PORT}`);
+app.listen(process.env.PORT||2000, () => {
+  console.log(`listening on port`);
 });

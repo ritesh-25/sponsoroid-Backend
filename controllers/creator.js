@@ -39,7 +39,7 @@ const register = async (req, res, next) => {
                 });
                 console.log(user);
                 user.save();
-                let token = jwt.sign({ UserId: user._id }, process.env.JWT_KEY);
+                let token = jwt.sign({ UserId: user._id, UserType:"creator" }, process.env.JWT_KEY);
                 res.status(200).json({
                     status: "Success",
                     message: "Registered successfully",
@@ -61,7 +61,7 @@ const login = async (req, res, next) => {
 
     bcrypt.compare(password, user.password, function (err, result) {
         if (result) {
-            let token = jwt.sign({ UserId: user._id }, process.env.JWT_KEY);
+            let token = jwt.sign({ UserId: user._id, UserType:"creator" }, process.env.JWT_KEY);
             return res.status(200).json({
                 Token: token,
                 User: user,
